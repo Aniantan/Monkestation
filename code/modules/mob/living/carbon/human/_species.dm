@@ -418,6 +418,9 @@ GLOBAL_LIST_EMPTY(features_by_species)
 
 		// at this point we already know new_organ is not null
 		if(existing_organ?.type == new_organ)
+			if(istype(existing_organ, /obj/item/organ/internal/heart)) //Make sure to get to get new blood type when changing species.
+				var/obj/item/organ/internal/heart/existing_heart = existing_organ
+				existing_heart.refresh_bloodtype(organ_holder)
 			continue // we don't want to remove organs that are the same as the new one
 
 		if(visual_only && !initial(new_organ.visual))
@@ -447,6 +450,9 @@ GLOBAL_LIST_EMPTY(features_by_species)
 			used_neworgan = TRUE
 			new_organ.set_organ_damage(new_organ.maxHealth * (1 - health_pct))
 			new_organ.Insert(organ_holder, special = TRUE, drop_if_replaced = FALSE)
+			if(istype(new_organ, /obj/item/organ/internal/heart)) //Make sure the new heart gets the correct specie bloodtype when changing species.
+				var/obj/item/organ/internal/heart/new_heart = new_organ
+				new_heart.refresh_bloodtype(organ_holder)
 
 		if(!used_neworgan)
 			QDEL_NULL(new_organ)
@@ -517,7 +523,7 @@ GLOBAL_LIST_EMPTY(features_by_species)
 	// Drop the items the new species can't wear
 	SEND_SIGNAL(C, COMSIG_SPECIES_GAIN_PRE, src, old_species)
 
-	if(C.dna.species.exotic_bloodtype)
+	if(C.dna.species.exotic_bloodtype && !(C.get_organ_by_type(/obj/item/organ/internal/heart))) //don't change the bloodtype if the human has a heart
 		C.dna.human_blood_type = exotic_bloodtype
 
 	if(C.hud_used)
@@ -594,7 +600,7 @@ GLOBAL_LIST_EMPTY(features_by_species)
  */
 /datum/species/proc/on_species_loss(mob/living/carbon/human/C, datum/species/new_species, pref_load)
 	SHOULD_CALL_PARENT(TRUE)
-	if(C.dna.species.exotic_bloodtype)
+	if(C.dna.species.exotic_bloodtype && !(C.get_organ_by_type(/obj/item/organ/internal/heart))) //Don't reset the blood type if the human has a heart.
 		C.dna.human_blood_type = random_human_blood_type()
 	for(var/X in inherent_traits)
 		REMOVE_TRAIT(C, X, SPECIES_TRAIT)

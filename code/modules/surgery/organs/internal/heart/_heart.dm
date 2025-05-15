@@ -29,21 +29,64 @@
 	icon_state = "[base_icon_state]-[beating ? "on" : "off"]"
 	return ..()
 
+/obj/item/organ/internal/heart/proc/handle_bloodtype(mob/living/carbon/owner)
+	// If the heart has a bloodtype, assign the bloodtype to owner.
+	if(heart_bloodtype)
+		owner.dna?.human_blood_type = heart_bloodtype
+		return
+	// If the heart has no bloodtype, copy owner's bloodtype to the heart.
+	if(owner.dna?.human_blood_type)
+		heart_bloodtype = owner.dna?.human_blood_type
+
+/obj/item/organ/internal/heart/proc/revert_bloodtype(mob/living/carbon/owner)
+	// If the owner's specie has an exotic blood, use that.
+	if(owner.dna?.species.exotic_bloodtype)
+		owner.dna?.human_blood_type = owner.dna?.species.exotic_bloodtype
+		return
+	// If the heart's bloodtype is a human bloodtype and the owner's specie does not use exotic blood, keep it.
+	if(ispath(heart_bloodtype, /datum/blood_type/crew/human))
+		return
+	owner.dna?.human_blood_type = random_human_blood_type()
+
 /obj/item/organ/internal/heart/Insert(mob/living/carbon/receiver, special, drop_if_replaced)
 	. = ..()
-	if(heart_bloodtype)
-		receiver.dna?.human_blood_type = heart_bloodtype
+	handle_bloodtype(receiver)
 
 /obj/item/organ/internal/heart/Remove(mob/living/carbon/heartless, special = 0)
 	. = ..()
-	if(heart_bloodtype)
-		heartless.dna?.human_blood_type = random_human_blood_type()
+	revert_bloodtype(heartless)
 	if(!special)
 		addtimer(CALLBACK(src, PROC_REF(stop_if_unowned)), 120)
 
 /obj/item/organ/internal/heart/proc/stop_if_unowned()
 	if(!owner)
 		Stop()
+
+// Changes the heart's bloodtype to whatever bloodtype the owner's specie would have normally.
+/obj/item/organ/internal/heart/proc/refresh_bloodtype(mob/living/carbon/owner)
+	revert_bloodtype(owner)
+	heart_bloodtype = owner.dna?.human_blood_type
+
+// Sets heart's bloodtype to null, allowing to be assigned new one.
+/obj/item/organ/internal/heart/proc/reset_bloodtype(mob/living/user)
+	to_chat(user, span_notice("You begin to reset [src]'s blood type."))
+	if(!(do_after(user, 1 SECONDS, src)))
+		return
+	to_chat(user, span_notice("You successfully reset [src]'s blood type."))
+	heart_bloodtype = null
+
+// Reset heart's bloodtype to null with hemostat or screwdriver.
+/obj/item/organ/internal/heart/attackby(obj/item/attacking_item, mob/user, list/modifiers)
+	if(isnull(attacking_item.tool_behaviour))
+		return ..()
+	if(attacking_item.tool_behaviour == TOOL_HEMOSTAT && (organ_flags & ORGAN_EDIBLE))
+		reset_bloodtype(user)
+		return
+	if(attacking_item.tool_behaviour == TOOL_SCREWDRIVER && (organ_flags & ORGAN_SYNTHETIC))
+		reset_bloodtype(user)
+		return
+	. = ..()
+
 
 /obj/item/organ/internal/heart/attack_self(mob/user)
 	..()
