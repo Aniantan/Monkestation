@@ -72,6 +72,8 @@
 	var/request_state = FALSE
 	///is this considered thermal paper?
 	var/thermal_paper = FALSE
+	///If this paper can be read by animals
+	var/animal_compatible = FALSE
 
 /obj/item/paper/Initialize(mapload)
 	. = ..()
@@ -301,7 +303,7 @@
 	set category = "Object"
 	set src in usr
 
-	if(!usr.can_read(src) || usr.is_blind() || usr.incapacitated(IGNORE_RESTRAINTS|IGNORE_GRAB) || (isobserver(usr) && !isAdminGhostAI(usr)))
+	if(!can_be_read_by(usr) || usr.is_blind() || usr.incapacitated(IGNORE_RESTRAINTS|IGNORE_GRAB) || (isobserver(usr) && !isAdminGhostAI(usr)))
 		return
 	if(ishuman(usr))
 		var/mob/living/carbon/human/H = usr
@@ -332,7 +334,7 @@
 		to_chat(user, span_warning("You are blind and can't read anything!"))
 		return
 
-	if(user.can_read(src))
+	if(can_be_read_by(user))
 		ui_interact(user)
 		return
 	. += span_warning("You cannot read it!")
@@ -352,7 +354,7 @@
 	if(user.is_blind())
 		to_chat(user, span_warning("You are blind and can't read anything!"))
 		return UI_CLOSE
-	if(!user.can_read(src))
+	if(!can_be_read_by(user))
 		return UI_CLOSE
 	if(in_contents_of(/obj/machinery/door/airlock) || in_contents_of(/obj/item/clipboard))
 		return UI_INTERACTIVE
@@ -418,7 +420,7 @@
 
 	// Handle stamping items.
 	if(writing_stats["interaction_mode"] == MODE_STAMPING)
-		if(!user.can_read(src) || user.is_blind())
+		if(!can_be_read_by(user) || user.is_blind())
 			//The paper's stampable window area is assumed approx 300x400
 			add_stamp(writing_stats["stamp_class"], rand(0, 300), rand(0, 400), rand(0, 360), writing_stats["stamp_icon_state"])
 			user.visible_message(span_notice("[user] blindly stamps [src] with \the [attacking_item]!"))
@@ -440,7 +442,7 @@
 		return NONE
 	if(writing_stats["interaction_mode"] != MODE_STAMPING)
 		return NONE
-	if(!user.can_read(src) || user.is_blind()) // Just leftclick instead
+	if(!can_be_read_by(user) || user.is_blind()) // Just leftclick instead
 		return NONE
 
 	add_stamp(writing_stats["stamp_class"], rand(1, 300), rand(1, 400), stamp_icon_state = writing_stats["stamp_icon_state"])
@@ -696,6 +698,13 @@
 	for(var/datum/paper_input/line as anything in raw_text_inputs)
 		paper_contents += line.raw_text + "/"
 	return paper_contents
+
+obj/item/paper/proc/can_be_read_by(mob/reader, silent = FALSE)
+	var/read_check_flags = READING_CHECK_LIGHT
+	if(!isanimal_or_basicmob(usr) || !animal_compatible)
+		read_check_flags |= READING_CHECK_LITERACY
+
+	return reader.can_read(src, read_check_flags, silent)
 
 /// A single instance of a saved raw input onto paper.
 /datum/paper_input
