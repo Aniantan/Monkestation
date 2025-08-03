@@ -22,6 +22,10 @@
 	var/variant = 1
 	///How many shit fits on the griddle?
 	var/max_items = 8
+	///The chance of burning a hand on the griddle
+	var/burn_chance = 3
+	///Damage to do when burning a hand
+	var/burn_damage = 5
 
 /obj/machinery/griddle/Initialize(mapload)
 	. = ..()
@@ -30,6 +34,7 @@
 		variant = rand(1,3)
 	RegisterSignal(src, COMSIG_ATOM_EXPOSE_REAGENT, PROC_REF(on_expose_reagent))
 	RegisterSignal(src, COMSIG_STORAGE_DUMP_CONTENT, PROC_REF(on_storage_dump))
+	ADD_TRAIT(src, TRAIT_ALT_CLICK_BLOCKER, INNATE_TRAIT)
 
 /obj/machinery/griddle/Destroy()
 	QDEL_NULL(grill_loop)
@@ -81,8 +86,11 @@
 	else
 		return ..()
 
-/obj/machinery/griddle/attack_hand(mob/user, list/modifiers)
+/obj/machinery/griddle/AltClick(mob/user)
 	. = ..()
+	if(!can_interact(user))
+		return
+
 	on = !on
 	if(on)
 		begin_processing()
@@ -91,6 +99,33 @@
 	update_appearance()
 	update_grill_audio()
 
+/obj/machinery/griddle/attack_hand(mob/living/carbon/human/user, list/modifiers)
+	. = ..()
+	if(!on)
+		return
+	if(!Adjacent(user))
+		return
+	var/protected = FALSE
+	if(user.gloves)
+		var/obj/item/clothing/gloves/electrician_gloves = user.gloves
+		if(electrician_gloves.max_heat_protection_temperature > 360)
+			protected = TRUE
+	if(protected || HAS_TRAIT(user, TRAIT_RESISTHEAT) || HAS_TRAIT(user, TRAIT_RESISTHEATHANDS))
+		return
+	if(!prob(burn_chance))
+		return
+	var/obj/item/bodypart/hand = user.get_active_hand()
+	if(!hand)
+		return
+	if(!HAS_TRAIT(user, TRAIT_NEVER_WOUNDED))
+		user.cause_wound_of_type_and_severity(WOUND_BURN, WOUND_SEVERITY_MODERATE)
+	hand.receive_damage(0, burn_damage)
+	user.update_damage_overlays()
+	to_chat(user, span_warning("You burn your hand on [src]!"))
+
+/obj/machinery/griddle/examine(mob/user)
+	. = ..()
+	. += span_info("Alt-click to toggle power.")
 
 /obj/machinery/griddle/proc/AddToGrill(obj/item/item_to_grill, mob/user)
 	vis_contents += item_to_grill
