@@ -14,6 +14,7 @@
 	chooses_bodycolor = FALSE
 	pass_flags = PASSTABLE|PASSGRILLE|PASSMOB|PASSDOORS
 	hungry = TRUE
+	stamp_image = "stamp-rat"
 
 /mob/living/basic/mouse/plague/Initialize(mapload, tame, new_body_color)
 	. = ..()

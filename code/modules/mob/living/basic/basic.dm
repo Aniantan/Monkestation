@@ -115,6 +115,11 @@
 	///This damage is taken when the body temp is too hot. Set both this and unsuitable_cold_damage to 0 to avoid adding the basic_body_temp_sensitive element.
 	var/unsuitable_heat_damage = 1
 
+	///What stamp png to use when leaving a print on pheromone paper
+	var/stamp_image
+	///What stamp overlay to use
+	var/stamp_overlay = "stamp-basicmob"
+
 /mob/living/basic/Initialize(mapload)
 	. = ..()
 
@@ -349,3 +354,12 @@
 	return
 //MONKESTATION EDIT STOP
 
+/mob/living/basic/proc/get_stamp_info()
+	if(!stamp_image)
+		return
+	var/datum/asset/spritesheet/sheet = get_asset_datum(/datum/asset/spritesheet/simple/paper)
+	return list(
+		interaction_mode = MODE_STAMPING,
+		stamp_icon_state = stamp_overlay,
+		stamp_class = sheet.icon_class_name(stamp_image)
+	)

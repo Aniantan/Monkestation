@@ -345,6 +345,7 @@
 	web_speed = 0.5
 	web_type = /datum/action/cooldown/mob_cooldown/lay_web/sealer
 	menu_description = "Royal spider variant specializing in reproduction and leadership, deals low damage."
+	stamp_image = "stamp-spider"
 
 /mob/living/basic/spider/giant/midwife/Initialize(mapload)
 	. = ..()

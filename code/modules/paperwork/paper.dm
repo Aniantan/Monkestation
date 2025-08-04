@@ -356,6 +356,8 @@
 		return UI_CLOSE
 	if(!can_be_read_by(user))
 		return UI_CLOSE
+	if(isbasicmob(user) && animal_compatible)
+		return UI_INTERACTIVE
 	if(in_contents_of(/obj/machinery/door/airlock) || in_contents_of(/obj/item/clipboard))
 		return UI_INTERACTIVE
 	return ..()
@@ -533,7 +535,7 @@
 		if(!istype(holding, /obj/item/stamp) && clipboard.pen)
 			holding = clipboard.pen
 
-	data["held_item_details"] = holding?.get_writing_implement_details()
+	data["held_item_details"] = get_write_details(user, holding)
 
 	// If the paper is on an unwritable noticeboard, clear the held item details so it's read-only.
 	if(istype(loc, /obj/structure/noticeboard))
@@ -553,9 +555,8 @@
 	switch(action)
 		if("add_stamp")
 			var/obj/item/holding = user.get_active_held_item()
-			var/stamp_info = holding?.get_writing_implement_details()
+			var/stamp_info = get_write_details(user, holding)
 			if(!stamp_info || (stamp_info["interaction_mode"] != MODE_STAMPING))
-				to_chat(src, span_warning("You can't stamp with the [holding]!"))
 				return TRUE
 
 			var/stamp_class = stamp_info["stamp_class"];
@@ -573,11 +574,17 @@
 			var/stamp_icon_state = stamp_info["stamp_icon_state"]
 
 			if (LAZYLEN(raw_stamp_data) >= MAX_PAPER_STAMPS)
-				to_chat(usr, pick("You try to stamp but you miss!", "There is no where else you can stamp!"))
+				if(holding)
+					to_chat(user, span_warning(pick("You try to stamp but you miss!", "There is no where else you can stamp!")))
+				else
+					to_chat(user, span_warning(pick("You try to leave a print but you miss!", "There is no where else you can leave a print!")))
 				return TRUE
 
 			add_stamp(stamp_class, stamp_x, stamp_y, stamp_rotation, stamp_icon_state)
-			user.visible_message(span_notice("[user] stamps [src] with \the [holding.name]!"), span_notice("You stamp [src] with \the [holding.name]!"))
+			if(holding)
+				user.visible_message(span_notice("[user] stamps [src] with \the [holding.name]!"), span_notice("You stamp [src] with \the [holding.name]!"))
+			else
+				user.visible_message(span_notice("[user] leaves a print on [src]!"), span_notice("You leave a print on [src]!"))
 			playsound(src, 'sound/items/handling/standard_stamp.ogg', 50, vary = TRUE)
 
 			update_appearance()
@@ -699,12 +706,21 @@
 		paper_contents += line.raw_text + "/"
 	return paper_contents
 
-obj/item/paper/proc/can_be_read_by(mob/reader, silent = FALSE)
+/// Check if a mob can read the paper while respecting animal_compatible var
+/obj/item/paper/proc/can_be_read_by(mob/user, silent = FALSE)
 	var/read_check_flags = READING_CHECK_LIGHT
-	if(!isanimal_or_basicmob(usr) || !animal_compatible)
+	if(!isanimal_or_basicmob(user) || !animal_compatible)
 		read_check_flags |= READING_CHECK_LITERACY
 
-	return reader.can_read(src, read_check_flags, silent)
+	return user.can_read(src, read_check_flags, silent)
+
+/// Get writing implement details from an item or a mob
+/obj/item/paper/proc/get_write_details(mob/user, obj/item/holding)
+	if(holding)
+		return holding?.get_writing_implement_details()
+	if(isbasicmob(user))
+		var/mob/living/basic/stamper = user
+		return stamper?.get_stamp_info()
 
 /// A single instance of a saved raw input onto paper.
 /datum/paper_input
@@ -821,6 +837,17 @@ obj/item/paper/proc/can_be_read_by(mob/reader, silent = FALSE)
 
 /obj/item/paper/crumpled/muddy
 	icon_state = "scrap_mud"
+
+/obj/item/paper/pheromone
+	name = "pheromone paper"
+	desc = "A special sheet of paper that uses various techniques, such as usage pheromones, that allow lifeforms normally incapable of reading to understand its content."
+	animal_compatible = TRUE
+	color = COLOR_SILVER
+
+/obj/item/paper/pheromone/craftable
+	name = "gross paper"
+	desc = "A strange piece of paper coated in something that seems to catch the interest of rats..."
+	color = COLOR_OFF_WHITE
 
 /obj/item/paper/selfdestruct
 	name = "Self-Incinerating Note"

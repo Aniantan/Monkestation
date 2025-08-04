@@ -34,3 +34,13 @@
 	)
 	tool_paths = list(/obj/item/stamp/head/captain)
 	category = CAT_MISC
+
+/datum/crafting_recipe/craftable_pheromone_paper
+	result = /obj/item/paper/pheromone/craftable
+	time = 5 SECONDS
+	reqs = list(
+		/obj/item/paper = 1,
+		/datum/reagent/rat_spit = 5,
+	)
+	blacklist = list(/obj/item/paper/pheromone)
+	category = CAT_MISC

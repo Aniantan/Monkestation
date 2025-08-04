@@ -40,6 +40,8 @@
 
 	ai_controller = /datum/ai_controller/basic_controller/regal_rat
 
+	stamp_image = "stamp-rat"
+
 	///Should we request a mind immediately upon spawning?
 	var/poll_ghosts = FALSE
 	/// String tied to our special moniker for examination. Contains a nice message tied to the potential funny regal name we have.
