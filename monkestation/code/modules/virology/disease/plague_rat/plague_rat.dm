@@ -14,11 +14,11 @@
 	chooses_bodycolor = FALSE
 	pass_flags = PASSTABLE|PASSGRILLE|PASSMOB|PASSDOORS
 	hungry = TRUE
-	stamp_image = "stamp-rat"
 
 /mob/living/basic/mouse/plague/Initialize(mapload, tame, new_body_color)
 	. = ..()
 	add_movespeed_modifier(/datum/movespeed_modifier/plague_rat)
+	AddComponent(/datum/component/stamper, "stamp-rat")
 
 
 /mob/living/basic/mouse/plague/attack_hand(mob/living/carbon/human/user, list/modifiers)

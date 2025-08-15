@@ -719,8 +719,8 @@
 	if(holding)
 		return holding?.get_writing_implement_details()
 	if(isbasicmob(user))
-		var/mob/living/basic/stamper = user
-		return stamper?.get_stamp_info()
+		var/datum/component/stamper/stamp = user?.GetComponent(/datum/component/stamper)
+		return stamp?.get_stamp_info()
 
 /// A single instance of a saved raw input onto paper.
 /datum/paper_input

@@ -345,7 +345,6 @@
 	web_speed = 0.5
 	web_type = /datum/action/cooldown/mob_cooldown/lay_web/sealer
 	menu_description = "Royal spider variant specializing in reproduction and leadership, deals low damage."
-	stamp_image = "stamp-spider"
 
 /mob/living/basic/spider/giant/midwife/Initialize(mapload)
 	. = ..()
@@ -377,6 +376,7 @@
 	not_hivemind_talk.Grant(src)
 
 	AddElement(/datum/element/web_walker, /datum/movespeed_modifier/average_web)
+	AddComponent(/datum/component/stamper, "stamp-spider")
 
 /**
  * ### Giant Ice Spider

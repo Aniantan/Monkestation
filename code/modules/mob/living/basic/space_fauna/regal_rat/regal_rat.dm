@@ -40,8 +40,6 @@
 
 	ai_controller = /datum/ai_controller/basic_controller/regal_rat
 
-	stamp_image = "stamp-rat"
-
 	///Should we request a mind immediately upon spawning?
 	var/poll_ghosts = FALSE
 	/// String tied to our special moniker for examination. Contains a nice message tied to the potential funny regal name we have.
@@ -57,6 +55,7 @@
 	AddElement(/datum/element/waddling)
 	AddElement(/datum/element/ai_retaliate)
 	AddElement(/datum/element/door_pryer, pry_time = 5 SECONDS, interaction_key = REGALRAT_INTERACTION)
+	AddComponent(/datum/component/stamper, "stamp-rat")
 	AddComponent(\
 		/datum/component/ghost_direct_control,\
 		poll_candidates = poll_ghosts,\
