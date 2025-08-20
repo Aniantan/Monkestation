@@ -42,6 +42,9 @@
 		stack_trace("Sign Language component added to [parent] ([parent?.type]) which is not a /mob/living/carbon subtype.")
 		return COMPONENT_INCOMPATIBLE
 	linked_action = new(src)
+	// Remove the skipped sign training quirk trait
+	if(HAS_TRAIT(parent, TRAIT_NO_SIGN_LANG))
+		REMOVE_TRAIT(parent, TRAIT_NO_SIGN_LANG, QUIRK_TRAIT)
 
 /datum/component/sign_language/Destroy()
 	QDEL_NULL(linked_action)
