@@ -1728,6 +1728,7 @@
 #include "code\datums\quirks\neutral_quirks\heterochromatic.dm"
 #include "code\datums\quirks\neutral_quirks\introvert.dm"
 #include "code\datums\quirks\neutral_quirks\monochromatic.dm"
+#include "code\datums\quirks\neutral_quirks\no_sign_language.dm"
 #include "code\datums\quirks\neutral_quirks\no_taste.dm"
 #include "code\datums\quirks\neutral_quirks\phobia.dm"
 #include "code\datums\quirks\neutral_quirks\photographer.dm"
