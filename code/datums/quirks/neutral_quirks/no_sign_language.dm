@@ -1,5 +1,5 @@
 /datum/quirk/no_sign
-	name = "Skipped sign training"
+	name = "Skipped Sign Training"
 	desc = "You are not able to comprehend sign language"
 	icon = FA_ICON_USER_TIE
 	value = 0

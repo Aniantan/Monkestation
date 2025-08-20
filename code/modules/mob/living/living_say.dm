@@ -325,13 +325,16 @@ GLOBAL_LIST_INIT(message_modes_stat_limits, list(
 			deaf_type = MSG_AUDIBLE
 
 		// Create map text prior to modifying message for goonchat, sign lang edition
-		if (client?.prefs.read_preference(/datum/preference/toggle/enable_runechat) && !(stat == UNCONSCIOUS || stat == HARD_CRIT || is_blind()) && (client.prefs.read_preference(/datum/preference/toggle/enable_runechat_non_mobs) || ismob(speaker)))
+		if (client?.prefs.read_preference(/datum/preference/toggle/enable_runechat) && !(stat == UNCONSCIOUS || stat == HARD_CRIT || is_blind() || HAS_TRAIT(src, TRAIT_NO_SIGN_LANG)) && (client.prefs.read_preference(/datum/preference/toggle/enable_runechat_non_mobs) || ismob(speaker)))
 			if (message_mods[MODE_CUSTOM_SAY_ERASE_INPUT])
 				create_chat_message(speaker, null, message_mods[MODE_CUSTOM_SAY_EMOTE], spans, EMOTE_MESSAGE)
 			else
 				create_chat_message(speaker, message_language, raw_message, spans)
 
 		if(is_blind())
+			return FALSE
+		if(HAS_TRAIT(src, TRAIT_NO_SIGN_LANG))
+			to_chat(src, span_info("[speaker] signs something but you don't understand it."))
 			return FALSE
 
 		message = deaf_message

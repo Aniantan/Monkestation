@@ -425,6 +425,8 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 /* #define TRAIT_PAPER_MASTER "paper_master" */
 /// This mob is able to use sign language over the radio.
 #define TRAIT_CAN_SIGN_ON_COMMS "can_sign_on_comms"
+/// Indicates if the mob can't understand sign language as if they were blind
+#define TRAIT_NO_SIGN_LANG "no_sign_language"
 /// nobody can use martial arts on this mob
 #define TRAIT_MARTIAL_ARTS_IMMUNE "martial_arts_immune"
 /// Immune to being afflicted by time stop (spell)

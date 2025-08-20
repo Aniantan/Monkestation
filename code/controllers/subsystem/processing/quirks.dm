@@ -35,6 +35,7 @@ PROCESSING_SUBSYSTEM_DEF(quirks)
 		list("Social Anxiety", "Mute"),
 		list("Mute", "Soft-Spoken"),
 		list("Stormtrooper Aim", "Big Hands"),
+		list("Signer", "Skipped Sign Training"),
 		//list("Bilingual", "Foreigner"), //monkestation edit, commented out
 		//MONKESTATION ADDITION START
 		list("Listener", "Uncommon"),

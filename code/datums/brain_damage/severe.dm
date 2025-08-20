@@ -315,7 +315,11 @@
 	owner.remove_status_effect(/datum/status_effect/trance)
 
 /datum/brain_trauma/severe/hypnotic_trigger/handle_hearing(datum/source, list/hearing_args)
-	if(!owner.can_hear() || owner == hearing_args[HEARING_SPEAKER])
+	if(owner == hearing_args[HEARING_SPEAKER])
+		return
+	if((owner.is_blind() || HAS_TRAIT(owner, TRAIT_NO_SIGN_LANG)) && HAS_TRAIT(hearing_args[HEARING_SPEAKER], TRAIT_SIGN_LANG))
+		return
+	if(!owner.can_hear() && !HAS_TRAIT(hearing_args[HEARING_SPEAKER], TRAIT_SIGN_LANG))
 		return
 
 	var/regex/reg = new("(\\b[REGEX_QUOTE(trigger_phrase)]\\b)","ig")
