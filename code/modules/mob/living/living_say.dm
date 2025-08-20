@@ -334,7 +334,7 @@ GLOBAL_LIST_INIT(message_modes_stat_limits, list(
 		if(is_blind())
 			return FALSE
 		if(HAS_TRAIT(src, TRAIT_NO_SIGN_LANG))
-			to_chat(src, span_info("[speaker] signs something but you don't understand it."))
+			to_chat(src, span_info("[span_name("[speaker]")] signs something but you don't understand it."))
 			return FALSE
 
 		message = deaf_message
